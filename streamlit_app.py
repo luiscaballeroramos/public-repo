@@ -13,7 +13,7 @@ try:
     from private_module.core import private_function
 except ImportError:
     # Instalar y recargar importación si falla
-    subprocess.check_call([sys.executable, "-m", "pip", "install","--user" repo_url])
+    subprocess.check_call([sys.executable, "-m", "pip", "install","--user", repo_url])
 
     # Añadir el directorio site-packages al path
     from site import getsitepackages, getusersitepackages
