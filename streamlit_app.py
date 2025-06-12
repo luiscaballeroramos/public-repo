@@ -13,15 +13,19 @@ try:
     from private_module.core import private_function
 except ImportError:
     # Instalar y recargar importación si falla
-    subprocess.check_call([sys.executable, "-m", "pip", "install","--user", repo_url])
+    subprocess.check_call([sys.executable, "-m", "pip", "install", repo_url])
+# Asegurar que el path del site-packages del venv esté incluido
+    for path in site.getsitepackages():
+        if path not in sys.path:
+            sys.path.append(path)
 
-    # Añadir el directorio site-packages al path
-    from site import getsitepackages, getusersitepackages
-    sys.path.extend(getsitepackages())
-    sys.path.append(getusersitepackages())
-
-    # Importar de nuevo usando importlib
-    private_module = importlib.import_module("private_module.core")
-    private_function = private_module.private_function
-    # Volvemos a intentar importar
+    # Intentar importar de nuevo
     from private_module.core import private_function
+
+
+# Código de Streamlit
+import streamlit as st
+
+st.title("Ejemplo usando un paquete privado")
+st.write("Resultado de `private_function()`:")
+st.code(private_function())
