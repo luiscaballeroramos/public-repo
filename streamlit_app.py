@@ -1,23 +1,25 @@
-import os
 import subprocess
-import streamlit as st
+import sys
+import os
+import importlib
 
-# Leer token y usuario desde los secretos
-token = st.secrets["GITHUB_TOKEN"]
-user = st.secrets["GITHUB_USER"]
+# Configuración
+token = os.getenv("GITHUB_TOKEN") or "ghp_xxx..."  # Usa tu token o variable de entorno
+user = os.getenv("GITHUB_USER")
 repo_url = f"git+https://{token}@github.com/{user}/private-repo.git#egg=private_module"
 
-# Intentar importar, si falla, instalar e importar
 try:
+    # Intentar importar directamente
     from private_module.core import private_function
 except ImportError:
-    subprocess.check_call(["pip", "install", repo_url])
-    from private_module.core import private_function
+    # Instalar y recargar importación si falla
+    subprocess.check_call([sys.executable, "-m", "pip", "install", repo_url])
 
-# UI Streamlit
-st.title("🔐 App con módulo privado")
+    # Añadir el directorio site-packages al path
+    from site import getsitepackages, getusersitepackages
+    sys.path.extend(getsitepackages())
+    sys.path.append(getusersitepackages())
 
-valor = st.number_input("Introduce un número:", value=1)
-if st.button("Ejecutar función privada"):
-    resultado = private_function(valor)
-    st.success(f"Resultado: {resultado}")
+    # Importar de nuevo usando importlib
+    private_module = importlib.import_module("private_module.core")
+    private_function = private_module.private_function
