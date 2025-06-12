@@ -1,31 +1,25 @@
 import subprocess
 import sys
 import os
-import importlib
+import site
 
-# Configuración
-token = os.getenv("GITHUB_TOKEN") or "ghp_xxx..."  # Usa tu token o variable de entorno
-user = os.getenv("GITHUB_USER")
-repo_url = f"git+https://{token}@github.com/{user}/private-repo.git#egg=private_module"
+LOCAL_PACKAGE_DIR = os.path.join(os.path.dirname(__file__), "external_packages")
+os.makedirs(LOCAL_PACKAGE_DIR, exist_ok=True)
+
+repo_url = "git+https://<TOKEN_PERSONAL>@github.com/luiscaballeroramos/private-repo.git#egg=private_module"
 
 try:
-    # Intentar importar directamente
     from private_module.core import private_function
 except ImportError:
-    # Instalar y recargar importación si falla
-    subprocess.check_call([sys.executable, "-m", "pip", "install", repo_url])
-# Asegurar que el path del site-packages del venv esté incluido
-    for path in site.getsitepackages():
-        if path not in sys.path:
-            sys.path.append(path)
-
-    # Intentar importar de nuevo
+    subprocess.check_call([
+        sys.executable, "-m", "pip", "install", "--target", LOCAL_PACKAGE_DIR, repo_url
+    ])
+    sys.path.append(LOCAL_PACKAGE_DIR)
     from private_module.core import private_function
 
-
-# Código de Streamlit
+# Ahora sí, usar Streamlit
 import streamlit as st
 
-st.title("Ejemplo usando un paquete privado")
-st.write("Resultado de `private_function()`:")
+st.title("Usando paquete privado sin permisos root")
+st.write("Resultado de private_function():")
 st.code(private_function())
