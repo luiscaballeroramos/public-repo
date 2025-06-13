@@ -1,0 +1,145 @@
+Estructura del repositorio: C:\Users\lca-dossa-cadiz\OneDrive\000_TestStreamlit\public-repo
+
+public-repo/
+    .env
+    .gitignore
+    estructura_y_contenido.txt
+
+--- Contenido de: estructura_y_contenido.txt ---
+
+--- Fin de: estructura_y_contenido.txt ---
+
+    install_private_packages.py
+
+--- Contenido de: install_private_packages.py ---
+import os
+import sys
+import subprocess
+from dotenv import load_dotenv
+
+TOKENS = {"private-repo": ("GITHUB_TOKEN", "GITHUB_USER")}
+PACKAGES_MODULES = {"private-repo": ["private_module", "private_module2"]}
+# Cargar variables de entorno
+load_dotenv()
+
+# Carpeta de instalación local
+package_dir = os.path.join(os.path.dirname(__file__), "external_packages")
+os.makedirs(package_dir, exist_ok=True)
+sys.path.append(package_dir)
+
+
+# Función reutilizable para asegurar que el módulo esté disponible
+def ensure_private_package(module_name: str, repo_name: str):
+    token = os.getenv(TOKENS[repo_name][0])
+    user = os.getenv(TOKENS[repo_name][1])
+    if not token or not user:
+        raise EnvironmentError("Faltan GITHUB_TOKEN o GITHUB_USER en el archivo .env")
+    try:
+        __import__(module_name)
+    except ImportError:
+        repo_url = (
+            f"git+https://{token}@github.com/{user}/{repo_name}.git#egg={module_name}"
+        )
+        subprocess.check_call(
+            [sys.executable, "-m", "pip", "install", "--target", package_dir, repo_url]
+        )
+        __import__(module_name)
+
+
+# Asegurar paquete privado (reutilizable)
+for repo, modules in PACKAGES_MODULES.items():
+    for module in modules:
+        ensure_private_package(module, repo)
+
+--- Fin de: install_private_packages.py ---
+
+    README.md
+    requirements.txt
+
+--- Contenido de: requirements.txt ---
+streamlit
+python-dotenv
+# git+https://$GITHUB_TOKEN@github.com/$GITHUB_USER/private-repo.git#egg=private_module
+
+
+--- Fin de: requirements.txt ---
+
+    streamlit_app copy.py
+
+--- Contenido de: streamlit_app copy.py ---
+# import subprocess
+# import sys
+# import os
+# import site
+# from dotenv import load_dotenv
+
+# load_dotenv()
+
+# token = os.getenv("GITHUB_TOKEN")
+# user = os.getenv("GITHUB_USER")
+# if not token or not user:
+#     raise EnvironmentError("Faltan GITHUB_TOKEN o GITHUB_USER en el archivo .env")
+
+# repo_url = f"git+https://{token}@github.com/{user}/private-repo.git#egg=private_module"
+# LOCAL_PACKAGE_DIR = os.path.join(os.path.dirname(__file__), "external_packages")
+# os.makedirs(LOCAL_PACKAGE_DIR, exist_ok=True)
+
+# try:
+#     from private_module.core import private_function
+# except ImportError:
+#     subprocess.check_call(
+#         [
+#             sys.executable,
+#             "-m",
+#             "pip",
+#             "install",
+#             "--target",
+#             LOCAL_PACKAGE_DIR,
+#             repo_url,
+#         ]
+#     )
+#     sys.path.append(LOCAL_PACKAGE_DIR)
+#     from private_module.core import private_function
+
+# # Ahora sí, usar Streamlit
+# import streamlit as st
+
+# st.title("Usando paquete privado sin permisos root")
+# st.write("Resultado de private_function():")
+# st.code(private_function(5))
+
+--- Fin de: streamlit_app copy.py ---
+
+    streamlit_app.py
+
+--- Contenido de: streamlit_app.py ---
+import install_private_packages
+
+# Ya puedes importar lo que necesites del paquete
+from private_module.core import private_function
+from private_module2.core2 import private_function2
+
+# Streamlit app
+import streamlit as st
+
+st.title("Usando paquete privado sin permisos root")
+user_input = st.text_input("Introduce un valor para private_function:", value="5")
+
+if st.button("Calcular"):
+    try:
+        input_value = int(user_input)
+        st.success(f"Resultado de private_function: {private_function(input_value)}")
+        st.success(
+            f"Resultado de private_function2: {private_function2(float(input_value))}"
+        )
+    except Exception as e:
+        st.error(f"Error: {e}")
+
+--- Fin de: streamlit_app.py ---
+
+    __init__.py
+
+--- Contenido de: __init__.py ---
+
+--- Fin de: __init__.py ---
+
