@@ -37,4 +37,4 @@ import streamlit as st
 
 st.title("Usando paquete privado sin permisos root")
 st.write("Resultado de private_function():")
-st.code(private_function())
+st.code(private_function(5))
