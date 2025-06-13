@@ -7,14 +7,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-token = os.getenv("GITHUB_TOKEN")
-user = os.getenv("GITHUB_USER")
-if not token or not user:
-    raise EnvironmentError("Faltan GITHUB_TOKEN o GITHUB_USER en el archivo .env")
+# token = os.getenv("GITHUB_TOKEN")
+# user = os.getenv("GITHUB_USER")
+# if not token or not user:
+#     raise EnvironmentError("Faltan GITHUB_TOKEN o GITHUB_USER en el archivo .env")
 
-repo_url = f"git+https://{token}@github.com/{user}/private-repo.git#egg=private_module"
-LOCAL_PACKAGE_DIR = os.path.join(os.path.dirname(__file__), "external_packages")
-os.makedirs(LOCAL_PACKAGE_DIR, exist_ok=True)
+# repo_url = f"git+https://{token}@github.com/{user}/private-repo.git#egg=private_module"
+# LOCAL_PACKAGE_DIR = os.path.join(os.path.dirname(__file__), "external_packages")
+# os.makedirs(LOCAL_PACKAGE_DIR, exist_ok=True)
 
 # try:
 #     from private_module.core import private_function
