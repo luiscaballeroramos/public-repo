@@ -4,7 +4,7 @@ import subprocess
 from dotenv import load_dotenv
 
 TOKENS = {"private-repo": ("GITHUB_TOKEN", "GITHUB_USER")}
-PACKAGES_MODULES = {"private-repo": ["private_module"]}
+PACKAGES_MODULES = {"private-repo": ["private_module", "private_module2"]}
 # Cargar variables de entorno
 load_dotenv()
 
