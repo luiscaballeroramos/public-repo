@@ -41,5 +41,12 @@ from private_module.core import private_function
 import streamlit as st
 
 st.title("Usando paquete privado sin permisos root")
-st.write("Resultado de private_function(5):")
-st.code(private_function(5))
+user_input = st.text_input("Introduce un valor para private_function:", value="5")
+
+if st.button("Calcular"):
+    try:
+        input_value = int(user_input)
+        result = private_function(input_value)
+        st.success(f"Resultado: {result}")
+    except Exception as e:
+        st.error(f"Error: {e}")
